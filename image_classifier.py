@@ -9,13 +9,21 @@ import torch.optim as optim
 import matplotlib.pyplot as plt
 from torch.utils import model_zoo
 
-transform = transforms.Compose(
-	[transforms.ToTensor(),
+transform_test = transforms.Compose(
+	[transforms.RandomRotation(15),
+	 transforms.RandomHorizontalFlip(),
+	 transforms.ToTensor(),
 	 transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 
-trainset = torchvision.datasets.CIFAR10(root='./data', train=True, download=True, transform=transform)
+transform_train = transforms.Compose(
+	[transforms.RandomRotation(15),
+	 transforms.RandomHorizontalFlip(),
+	 transforms.ToTensor(),
+	 transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+
+trainset = torchvision.datasets.CIFAR10(root='./data', train=True, download=True, transform=transform_train)
 trainloader = torch.utils.data.DataLoader(trainset, batch_size=40, shuffle=True, num_workers=2)
-testset = torchvision.datasets.CIFAR10(root='./data', train=False, download=True, transform=transform)
+testset = torchvision.datasets.CIFAR10(root='./data', train=False, download=True, transform=transform_test)
 testloader = torch.utils.data.DataLoader(testset, batch_size=40, shuffle=False, num_workers=2)
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -80,16 +88,16 @@ convs = nn.Sequential(
     nn.ReLU(),  # relu1-2
     nn.MaxPool2d((2, 2), (2, 2), (0, 0), ceil_mode=True),
 
-    nn.ReflectionPad2d((1, 1, 1, 1)),
-    nn.Conv2d(64, 128, (3, 3)),
-    nn.BatchNorm2d(128),
-    nn.ReLU(),  # relu2-1
-    nn.ReflectionPad2d((1, 1, 1, 1)),
-    nn.Conv2d(128, 128, (3, 3)),
-    nn.BatchNorm2d(128),
-    nn.ReLU(),  # relu2-2
-    nn.MaxPool2d((2, 2), (2, 2), (0, 0), ceil_mode=True),
-    nn.Dropout(0.3),
+    # nn.ReflectionPad2d((1, 1, 1, 1)),
+    # nn.Conv2d(64, 128, (3, 3)),
+    # nn.BatchNorm2d(128),
+    # nn.ReLU(),  # relu2-1
+    # nn.ReflectionPad2d((1, 1, 1, 1)),
+    # nn.Conv2d(128, 128, (3, 3)),
+    # nn.BatchNorm2d(128),
+    # nn.ReLU(),  # relu2-2
+    # nn.MaxPool2d((2, 2), (2, 2), (0, 0), ceil_mode=True),
+    # nn.Dropout(0.3),
 
     nn.ReflectionPad2d((1, 1, 1, 1)),
     nn.Conv2d(128, 256, (3, 3)),
@@ -105,16 +113,16 @@ convs = nn.Sequential(
     nn.ReLU(),  # relu3-3 
     nn.MaxPool2d((2, 2), (2, 2), (0, 0), ceil_mode=True),
     nn.Dropout(0.4),
-  	# nn.ReflectionPad2d((1, 1, 1, 1)),
-   #  nn.Conv2d(256, 512, (3, 3)),
-   #  nn.BatchNorm2d(512),
-   #  nn.ReLU(),  # relu4-1
-   #  nn.ReflectionPad2d((1, 1, 1, 1)),
-   #  nn.Conv2d(512, 512, (3, 3)),
-   #  nn.BatchNorm2d(512),
-   #  nn.ReLU(),  # relu4-2
-   #  nn.Dropout(0.5),
-   #  nn.MaxPool2d((2, 2), (2, 2), (0, 0), ceil_mode=True),
+  	nn.ReflectionPad2d((1, 1, 1, 1)),
+    nn.Conv2d(256, 512, (3, 3)),
+    nn.BatchNorm2d(512),
+    nn.ReLU(),  # relu4-1
+    nn.ReflectionPad2d((1, 1, 1, 1)),
+    nn.Conv2d(512, 512, (3, 3)),
+    nn.BatchNorm2d(512),
+    nn.ReLU(),  # relu4-2
+    nn.Dropout(0.5),
+    nn.MaxPool2d((2, 2), (2, 2), (0, 0), ceil_mode=True),
 )
 
 
@@ -122,11 +130,62 @@ class NetModel(nn.Module):
 	def __init__(self):
 		super(NetModel, self).__init__()
 
-		self.convs = convs
-		# self.inception = models.inception_v3(pretrained=False)
-		self.inception3a = Inception(256, 128, 128, 192, 32, 96, 64)
-		self.inception4a = Inception(480, 192, 96, 208, 16, 48 ,64)
-		self.inception4b = Inception(512, 160, 112, 224, 24, 64, 64)
+		self.convs1 = nn.Sequential(
+			nn.Conv2d(3, 3, (1, 1)),
+     	nn.BatchNorm2d(3),
+     	nn.ReflectionPad2d((1, 1, 1, 1)),
+     	nn.Conv2d(3, 64, (3, 3)),
+     	nn.BatchNorm2d(64),
+     	nn.ReLU(),  # relu1-1
+     	nn.ReflectionPad2d((1, 1, 1, 1)),
+    
+   		nn.BatchNorm2d(64),
+    	nn.Conv2d(64, 64, (3, 3)),
+    	nn.BatchNorm2d(64),
+    	nn.ReLU(),
+    	nn.MaxPool2d((2, 2), (2, 2), (0, 0), ceil_mode=True),
+    )
+    	# nn.ReflectionPad2d((1, 1, 1, 1)),
+    	# nn.Conv2d(64, 128, (3, 3)),
+    	# nn.BatchNorm2d(128),
+    	# nn.ReLU(),
+    	# nn.ReflectionPad2d((1, 1, 1, 1)),
+    	# nn.Conv2d(128, 128, (3, 3)),
+    	# nn.BatchNorm2d(128),
+    	# nn.ReLU(),  # relu2-2
+    	# nn.MaxPool2d((2, 2), (2, 2), (0, 0), ceil_mode=True),
+
+		self.convs2 = nn.Sequential(
+    	nn.ReflectionPad2d((1, 1, 1, 1)),
+    	nn.Conv2d(128, 256, (3, 3)),
+    	nn.BatchNorm2d(256),
+    	nn.ReLU(),  # relu3-1
+    	nn.ReflectionPad2d((1, 1, 1, 1)),
+    	nn.Conv2d(256, 256, (3, 3)),
+    	nn.BatchNorm2d(256),
+    	nn.ReLU(),  # relu3-2
+    	nn.ReflectionPad2d((1, 1, 1, 1)),
+    	nn.Conv2d(256, 256, (3, 3)),
+    	nn.BatchNorm2d(256),
+    	nn.ReLU(),  # relu3-3 
+    	nn.MaxPool2d((2, 2), (2, 2), (0, 0), ceil_mode=True),
+    	nn.Dropout(0.4),
+    	nn.ReflectionPad2d((1, 1, 1, 1)),
+    	nn.Conv2d(256, 512, (3, 3)),
+    	nn.BatchNorm2d(512),
+    	nn.ReLU(),  # relu4-1
+    	nn.ReflectionPad2d((1, 1, 1, 1)),
+    	nn.Conv2d(512, 512, (3, 3)),
+    	nn.BatchNorm2d(512),
+    	nn.ReLU(),  # relu4-2
+    	nn.Dropout(0.5),
+    	nn.MaxPool2d((2, 2), (2, 2), (0, 0), ceil_mode=True),
+    	)
+
+		# self.inception1 = Inception(3, 18, 18, 36, 6, 9, 1) #18 + 36 + 9 + 1 = 64
+		# self.inception2 = Inception(64, 16, 16, 32, 6, 8 ,8)#16 + 32 + 8 + 8 = 64
+		self.inception1 = Inception(64, 32, 40, 80, 6, 8, 8)#32 + 64 + 8 + 8 = 128
+		self.inception2 = Inception(128, 32, 32, 64, 12, 16, 16)#32 + 64 + 16 + 16 = 128
 		# self.inception4c = Inception(512, 128, 128, 256, 24, 64, 64)
 		self.pool = nn.MaxPool2d((2, 2), (2, 2), (0, 0), ceil_mode=True)
 		self.fc1 = nn.Linear(512 * 2 * 2, 4096)
@@ -135,17 +194,21 @@ class NetModel(nn.Module):
 
 	def forward(self, x):
 
-		x = self.convs(x)
-		# 256 x 4 x 4
-		x = self.inception3a(x)
-		# 480 x 4 x 4
-		x = self.inception4a(x)
-		# 512 x 4 x 4 
-		x = self.inception4b(x)
-		# 512 x 4 x 4
-		# x = self.inception4c(x)
-		# 512 x 4 x 4
+		# 3 x 32 x 32
+		x = self.convs1(x)
+		# 64 x 16 x 16
+		x = self.inception1(x)
+		# 128 x 16 x 16
+		x = self.inception2(x)
+		# 128 x 16 x 16 
 		x = self.pool(x)
+		# 128 x 8 x 8
+		# x = self.inception3(x)
+		# 128 x 16 x 16
+		# x = self.inception4(x)
+		# 128 x 16 x 16
+		x = self.convs2(x)
+		# 512 x 2 x 2
 
 		x = x.view(-1, 512 * 2 * 2)
 		x = self.fc1(x)
@@ -155,9 +218,9 @@ class NetModel(nn.Module):
 
 net = NetModel()
 criterion = nn.CrossEntropyLoss()
-optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9, weight_decay=0.0001)
+optimizer = optim.SGD(net.parameters(), lr=5e-4, momentum=0.9, weight_decay=0.0001)
 
-def adjust_learning_rate(optimizer, iteration_count,lr=0.001,lr_decay=5e-6):
+def adjust_learning_rate(optimizer, iteration_count,lr=5e-4,lr_decay=5e-6):
     lr = lr / (1.0 + lr_decay * iteration_count)
     for param_group in optimizer.param_groups:
         param_group['lr'] = lr
@@ -188,7 +251,7 @@ class Trainer:
 
 				running_loss += loss.item()
 
-				if i%200 == 199:
+				if i%400 == 399:
 					self.loss_t.append(running_loss)
 					self.steps_t.append(self.global_step)
 					correct = 0
@@ -202,7 +265,7 @@ class Trainer:
 							total += labels.size(0)
 							correct += (predicted == labels).sum().item()
 							accu = 100 * correct / total
-					print('[%d, %5d] loss: %.3f accuracy: %d %%' % (self.epoch + 1, self.global_step, running_loss / 200, (accu)))
+					print('[%d, %5d] loss: %.3f accuracy: %d %%' % (self.epoch + 1, self.global_step, running_loss / 400, (accu)))
 					print('lr',optimizer.param_groups[0]['lr'])
 					self.acc_t.append(accu)
 					running_loss = 0.0
@@ -211,15 +274,15 @@ class Trainer:
 
 trainer = Trainer()
 trainer.train(100)
-torch.save(net.state_dict(), './models/inception10.pth')
+torch.save(net.state_dict(), './models/inception-f12.pth')
 
 plt.plot(trainer.steps_t, trainer.loss_t, 'r--')
 plt.xlabel('Number of Iterations')
 plt.ylabel("Loss")
-plt.savefig('./diagrams/check_i10_1.png')
+plt.savefig('./diagrams/check_if12_1.png')
 
 plt.clf()
 plt.plot(trainer.steps_t, trainer.acc_t, 'r--')
 plt.xlabel('Number of Iterations')
 plt.ylabel("Accuracy")
-plt.savefig('./diagrams/check_i10_2.png')
+plt.savefig('./diagrams/check_if12_2.png')

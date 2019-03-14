@@ -5,6 +5,7 @@ batch size 50, initial lr 0.0001, epoch 200, 71%
 [8] bs 20, lr 0.0001, epoch 50, lr decay 5e-6, weight decay 0.0005, 71%
 [9] bs 100 lr 0.0001, epoch 200, lr decay 5e-6,weight decay 0.0005, 52%
 
+##Inception at rear
 [10] inception1, bs20, lr 0.0001, epoch 100, lr decay 1e-6. 69%
 [11] inception2, bs 100, lr 0.0001, epoch 50, lr decay 5e-5. 40%
 [12] inception2, bs 50, lr 0.001, epoch 50, lr decay 1e-5, 84%
@@ -15,4 +16,18 @@ batch size 50, initial lr 0.0001, epoch 200, 71%
 [17] inception7, bs 40, lr 0.001, epoch 50, lr decay 1e-5, 86%
 [18] inception8, bs 45, lr 0.001, epoch 50, lr decay 1e-5, 85%
 [19] inception9, bs 40, lr 0.001, epoch 70, lr decay 1e-5, 85%
-[20] inception10, bs 40, lr 0.001, epoch 100, lr decay 5e-6,
+[20] inception10, bs 40, lr 0.001, epoch 100, lr decay 5e-6, 86%
+[21] inception11, bs 40, lr 0.001, epoch 200, lr decay 5e-6, 87%
+
+##Incuption at middle
+[1] inception-f1, bs40, lr 0.001, epoch 50, lr decay 5e-6, 87%
+[2] inception-f2, bs20, lr 0.001, epoch 50, lr decay 5e-6, 87%
+[3] inception-f3, bs40, lr 0.001, epoch 50, lr decay 5e-6, 86% (2 more inceptions)
+[4] inception-f4, bs80, lr 0.001, epoch 50, lr decay 5e-6, 85% (2 more inceptions)
+[5] inception-f5, bs40, lr 0.001, epoch 100, lr decay 5e-6, 85% (2 more inceptions)
+[6] inception-f6, bs40, lr 0.001, epoch 100, lr decay 5e-6, 85%(removed 64,64 and 128,128 inceptions)
+[7] inception-f7, bs40, lr 0.001, epoch 100, lr decay 5e-6, 85%
+[9] inception-f9, bs32, lr 1e-3, epoch 100, lr decay 5e-6, 86%
+[10] inception-f10, bs32, lr 1e-3, epoch100, lr decay 5e-6, 90%(Add Augmentation)
+[11] inception-f11, bs32, lr 5e-4, epoch200, lr decay 5e-6, 90%(Add Augmentation)
+[12] inception-f12, bs40, lr 5e-4, epoch100, lr decay 5e-6, %(Add Augmentation)
